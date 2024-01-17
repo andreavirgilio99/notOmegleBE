@@ -2,8 +2,8 @@ import express, { Express } from 'express';
 import cors from 'cors';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
-import { appConfig } from './utils';
-import { socketEventsConfiguration } from './socket';
+import { socketEventsConfig } from './socket/events-config';
+import { appConfig } from './utils/app-config';
 
 const app: Express = express();
 
@@ -18,7 +18,7 @@ const io: SocketIOServer = new SocketIOServer(server, {
 });
 
 appConfig(app);
-socketEventsConfiguration(io);
+socketEventsConfig(io);
 
 server.listen(3000, () => {
     console.log('Server listening on port 3000');

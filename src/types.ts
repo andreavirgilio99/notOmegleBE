@@ -1,3 +1,8 @@
+export interface User {
+    userData: UserData;
+    peerId: string;
+}
+
 export interface UserData {
     username: string;
     purpose: string;
@@ -16,5 +21,5 @@ export enum UserStatus {
     Pending = 'pending',
 }
 
-export type UsersCollection = Map<AgeGroup, Map<UserStatus, Map<string, UserData>>>;
-export type GetUsersCollectionResult = [(id: string, data: UserData) => void, (id: string) => void, (id: string, newStatus: UserStatus) => void];
+export type UsersCollection = Map<AgeGroup, Map<UserStatus, Map<string, User>>>;
+export type GetUsersCollectionResult = [(id: string, data: User) => void, (id: string) => void, (id: string, newStatus: UserStatus) => void];
