@@ -7,4 +7,8 @@ var Events;
     Events["Disconnect"] = "disconnect";
     Events["Welcome"] = "welcome";
     Events["DataRegistration"] = "data-registration";
+    Events["SearchStart"] = "search-start";
+    Events["SearchStop"] = "search-stop";
+    Events["SuccessfulPairing"] = "successful-pairing";
+    Events["PartnerDisconnected"] = "partner-disconnected";
 })(Events = exports.Events || (exports.Events = {}));
