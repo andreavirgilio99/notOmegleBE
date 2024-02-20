@@ -5,6 +5,6 @@ import axios from "axios"
  */
 export function IDontWannaSleepPapa() {
     setInterval(() => {
-        axios.get('https://hangman-game-6m0a.onrender.com/')
+        axios.get('https://totally-not-omegle.onrender.com/')
     }, 1000 * 180)
 }

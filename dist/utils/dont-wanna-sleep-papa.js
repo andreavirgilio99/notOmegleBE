@@ -10,7 +10,7 @@ const axios_1 = __importDefault(require("axios"));
  */
 function IDontWannaSleepPapa() {
     setInterval(() => {
-        axios_1.default.get('https://hangman-game-6m0a.onrender.com/');
+        axios_1.default.get('https://totally-not-omegle.onrender.com/');
     }, 1000 * 180);
 }
 exports.IDontWannaSleepPapa = IDontWannaSleepPapa;
