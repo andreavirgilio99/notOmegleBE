@@ -25,7 +25,7 @@ export function socketEventsConfig(io: SocketIOServer) {
         socket.emit(Events.Welcome, 'Successfuly connected to the WebSocket')
 
         sendMessageHandler(socket, io);
-        userDisconnectedHandler(socket, removeUser, switchUserStatus);
+        userDisconnectedHandler(socket, removeUser, switchUserStatus, searchCancel);
         dataRegistrationHandler(socket, addUser);
         searchStartHandler(socket, switchUserStatus, startSearch);
         searchStopHandler(socket, searchCancel);

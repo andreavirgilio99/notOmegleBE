@@ -16,7 +16,7 @@ function socketEventsConfig(io) {
         console.log('user connected');
         socket.emit(events_enum_1.Events.Welcome, 'Successfuly connected to the WebSocket');
         (0, send_message_handler_1.sendMessageHandler)(socket, io);
-        (0, disconnection_handler_1.userDisconnectedHandler)(socket, removeUser, switchUserStatus);
+        (0, disconnection_handler_1.userDisconnectedHandler)(socket, removeUser, switchUserStatus, searchCancel);
         (0, data_registration_handler_1.dataRegistrationHandler)(socket, addUser);
         (0, search_start_handler_1.searchStartHandler)(socket, switchUserStatus, startSearch);
         (0, search_stop_handler_1.searchStopHandler)(socket, searchCancel);
