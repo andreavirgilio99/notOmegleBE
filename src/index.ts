@@ -19,7 +19,6 @@ const io: SocketIOServer = new SocketIOServer(server, {
 
 appConfig(app);
 socketEventsConfig(io);
-setInterval(() => console.log('i\'m  alive'), 10 * 1000)
 server.listen(3000, () => {
     console.log('Server listening on port 3000');
 });

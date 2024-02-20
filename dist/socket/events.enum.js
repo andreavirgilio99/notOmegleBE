@@ -11,4 +11,7 @@ var Events;
     Events["SearchStop"] = "search-stop";
     Events["SuccessfulPairing"] = "successful-pairing";
     Events["PartnerDisconnected"] = "partner-disconnected";
+    Events["SendMessage"] = "send-message";
+    Events["MessageReceived"] = "message-received";
+    Events["LeaveCall"] = "leave-call";
 })(Events = exports.Events || (exports.Events = {}));

@@ -6,5 +6,8 @@ export enum Events {
     SearchStart = "search-start",
     SearchStop = "search-stop",
     SuccessfulPairing = "successful-pairing",
-    PartnerDisconnected = "partner-disconnected"
+    PartnerDisconnected = "partner-disconnected",
+    SendMessage = "send-message",
+    MessageReceived = "message-received",
+    LeaveCall = "leave-call"
 }

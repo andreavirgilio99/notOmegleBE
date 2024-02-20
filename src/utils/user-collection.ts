@@ -1,8 +1,8 @@
 import { Socket } from 'socket.io';
-import { AgeGroup, GetUsersCollectionResult, RemoveUserResult, SearchStartResult, SearchStatus, User, UserStatus, UsersCollection } from '../types';
+import { AgeGroup, UserCollectionHandlers, RemoveUserResult, SearchStartResult, SearchStatus, User, UserStatus, UsersCollection } from '../types';
 import { findCommonInterests } from './find-common-interests';
 
-export function getUsersCollection(): GetUsersCollectionResult {
+export function getUserCollectionHandlers(): UserCollectionHandlers {
     const pendingSearchs = new Map<string, SearchStatus>();
     const collection: UsersCollection = new Map([
         [AgeGroup.Adults, new Map([
@@ -17,8 +17,12 @@ export function getUsersCollection(): GetUsersCollectionResult {
         ])],
     ]);
 
+    //logging for debug
+    setInterval(() => console.log(collection.get(AgeGroup.Adults)), 25 * 1000)
+
     const addUser = (client: Socket, user: User) => {
         user.socket = client;
+        user.socketId = client.id;
         const ageGroup = user.userData.isMinor ? AgeGroup.Minors : AgeGroup.Adults;
         const status = UserStatus.Idle;
 
@@ -33,6 +37,7 @@ export function getUsersCollection(): GetUsersCollectionResult {
     const removeUser = (id: string) => {
         const result: RemoveUserResult = {
             wasPaired: false,
+            wasMinor: false,
             camPartner: undefined
         }
 
@@ -41,6 +46,7 @@ export function getUsersCollection(): GetUsersCollectionResult {
                 if (userMap.has(id)) {
                     if (status == UserStatus.Paired) {
                         result.wasPaired = true;
+                        result.wasMinor = userMap.get(id)!.userData.isMinor;
                         result.camPartner = userMap.get(id)!.camPartner;
                     }
                     userMap.delete(id);
@@ -66,6 +72,11 @@ export function getUsersCollection(): GetUsersCollectionResult {
                 const newStatusChunk = ageGroupChunk.get(newStatus);
 
                 if (newStatusChunk && user) {
+
+                    if (newStatus != UserStatus.Paired) {
+                        user.camPartner = undefined;
+                    }
+
                     newStatusChunk.set(id, user)
                 }
                 else {
@@ -75,54 +86,66 @@ export function getUsersCollection(): GetUsersCollectionResult {
         }
     };
 
+    const getUser = (id: string, status: UserStatus, ageGroup: AgeGroup): User | undefined => {
+        const ageGroupChunk = collection.get(ageGroup);
+
+        if (ageGroupChunk) {
+            const statusChunk = ageGroupChunk.get(status);
+
+            if (statusChunk) {
+                const user = statusChunk.get(id);
+                return user;
+            }
+        }
+    };
+
     const startSearch = async (id: string, ageGroup: AgeGroup, interests: string[]): Promise<SearchStartResult | undefined> => {
         return new Promise<SearchStartResult | undefined>((resolve) => {
             let result: SearchStartResult | undefined = undefined;
             pendingSearchs.set(id, SearchStatus.Ongoing);
             let thisUser: User | undefined = undefined;
-            const interval = setInterval(() => console.log(collection), 3000)
 
-            while (!result) {
-                if (pendingSearchs.get(id) === SearchStatus.Ongoing) {
-                    const ageChunk = collection.get(ageGroup);
+            const interval = setInterval(() => {
+                if (result) {
+                    clearInterval(interval);
+                    thisUser!.camPartner = result.userToPair.socket;
+                    result.userToPair.camPartner = thisUser!.socket;
+                    switchUserStatus(result.userToPair.socket!.id, UserStatus.Pending, ageGroup, UserStatus.Paired);
+                    pendingSearchs.delete(id);
+                    resolve(result);
+                }
 
-                    if (ageChunk) {
-                        const pendingChunk = ageChunk.get(UserStatus.Pending);
+                if (pendingSearchs.get(id) !== SearchStatus.Ongoing) { //user cancelled the search
+                    clearInterval(interval);
+                    pendingSearchs.delete(id);
+                    resolve(undefined);
+                }
 
-                        if (pendingChunk) {
-                            thisUser = pendingChunk.get(id)!;
-                            for (const [userId, user] of pendingChunk.entries()) {
-                                if (userId !== id) {
-                                    const commonInterests = findCommonInterests(interests, user.userData.interests);
+                const ageChunk = collection.get(ageGroup);
 
-                                    if (!result || commonInterests.length > result.sharedInterests.length) {
-                                        result = {
-                                            thisUser: thisUser,
-                                            userToPair: user,
-                                            sharedInterests: commonInterests
-                                        };
-                                    }
+                if (ageChunk) {
+                    const pendingChunk = ageChunk.get(UserStatus.Pending);
+
+                    if (pendingChunk) {
+                        thisUser = pendingChunk.get(id)!;
+                        for (const [userId, user] of pendingChunk.entries()) {
+                            if (userId !== id) {
+                                const commonInterests = findCommonInterests(interests, user.userData.interests);
+
+                                if (!result || commonInterests.length > result.sharedInterests.length) {
+                                    result = {
+                                        thisUser: thisUser,
+                                        userToPair: user,
+                                        sharedInterests: commonInterests
+                                    };
                                 }
                             }
                         }
-                    } else { //user cancelled the search
-                        pendingSearchs.delete(id);
-                        clearInterval(interval)
-                        resolve(undefined);
                     }
                 }
-            }
-
-            thisUser!.camPartner = result.userToPair.socket;
-            result.userToPair.camPartner = thisUser!.socket;
-            switchUserStatus(result.userToPair.socket.id, UserStatus.Pending, ageGroup, UserStatus.Paired);
-
-            pendingSearchs.delete(id);
-            clearInterval(interval)
-            resolve(result);
-        })
-
-    }
+            }, 50); // intervallo di ricerca in millisecondi
+        });
+    };
 
     const searchCancel = (id: string) => {
         if (pendingSearchs.has(id)) {
@@ -130,6 +153,6 @@ export function getUsersCollection(): GetUsersCollectionResult {
         }
     }
 
-    return [addUser, removeUser, switchUserStatus, startSearch, searchCancel];
+    return [addUser, getUser, removeUser, switchUserStatus, startSearch, searchCancel];
 }
 

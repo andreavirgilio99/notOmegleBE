@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserStatus = exports.AgeGroup = exports.SearchStatus = void 0;
 var SearchStatus;
 (function (SearchStatus) {
-    SearchStatus["Ongoing"] = "ongoing";
+    SearchStatus["Ongoing"] = "ongoin";
     SearchStatus["Stopped"] = "stopped";
 })(SearchStatus = exports.SearchStatus || (exports.SearchStatus = {}));
 var AgeGroup;
