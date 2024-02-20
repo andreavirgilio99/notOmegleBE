@@ -4,6 +4,10 @@ import path from 'path';
 export function appConfig(app: Express) {
     app.use(express.static(path.join(__dirname, 'resources')));
 
+    app.get('*', (req: Request, res: Response) => {
+        res.sendFile(path.join(__dirname, 'resources', 'index.html'));
+    });
+
     app.get('/assets/*', (req: Request, res: Response) => {
         res.sendFile(path.join(__dirname, 'resources', req.originalUrl));
     });
