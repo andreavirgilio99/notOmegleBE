@@ -17,9 +17,6 @@ export function getUserCollectionHandlers(): UserCollectionHandlers {
         ])],
     ]);
 
-    //logging for debug
-    setInterval(() => console.log(collection.get(AgeGroup.Adults)), 25 * 1000)
-
     const addUser = (client: Socket, user: User) => {
         user.socket = client;
         user.socketId = client.id;
@@ -108,11 +105,18 @@ export function getUserCollectionHandlers(): UserCollectionHandlers {
             const interval = setInterval(() => {
                 if (result) {
                     clearInterval(interval);
-                    thisUser!.camPartner = result.userToPair.socket;
-                    result.userToPair.camPartner = thisUser!.socket;
-                    switchUserStatus(result.userToPair.socket!.id, UserStatus.Pending, ageGroup, UserStatus.Paired);
-                    pendingSearchs.delete(id);
-                    resolve(result);
+                    if (thisUser) {
+                        thisUser.camPartner = result.userToPair.socket;
+                        result.userToPair.camPartner = thisUser!.socket;
+                        switchUserStatus(result.userToPair.socket!.id, UserStatus.Pending, ageGroup, UserStatus.Paired);
+                        pendingSearchs.delete(id);
+                        resolve(result);
+                    }
+                    else { //user disconnected while searching
+                        clearInterval(interval);
+                        pendingSearchs.delete(id);
+                        resolve(undefined);
+                    }
                 }
 
                 if (pendingSearchs.get(id) !== SearchStatus.Ongoing) { //user cancelled the search

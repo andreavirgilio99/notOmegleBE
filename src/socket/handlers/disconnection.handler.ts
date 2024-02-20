@@ -1,10 +1,11 @@
 import { Socket } from "socket.io";
-import { AgeGroup, RemoveUserFunction, SwitchUserStatusFunction, UserStatus } from "../../types";
+import { AgeGroup, RemoveUserFunction, SearchCancelFunction, SwitchUserStatusFunction, UserStatus } from "../../types";
 import { Events } from "../events.enum";
 
-export function userDisconnectedHandler(socket: Socket, removeUser: RemoveUserFunction, switchUserStatus: SwitchUserStatusFunction) {
+export function userDisconnectedHandler(socket: Socket, removeUser: RemoveUserFunction, switchUserStatus: SwitchUserStatusFunction, searchCancel: SearchCancelFunction) {
     socket.on(Events.Disconnect, () => {
         console.log("user disconnected");
+        searchCancel(socket.id)
         const result = removeUser(socket.id);
         socket.removeAllListeners();
 

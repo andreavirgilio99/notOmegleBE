@@ -3,9 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userDisconnectedHandler = void 0;
 const types_1 = require("../../types");
 const events_enum_1 = require("../events.enum");
-function userDisconnectedHandler(socket, removeUser, switchUserStatus) {
+function userDisconnectedHandler(socket, removeUser, switchUserStatus, searchCancel) {
     socket.on(events_enum_1.Events.Disconnect, () => {
         console.log("user disconnected");
+        searchCancel(socket.id);
         const result = removeUser(socket.id);
         socket.removeAllListeners();
         if (result.wasPaired) {
