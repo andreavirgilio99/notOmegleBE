@@ -9,16 +9,21 @@ const http_1 = __importDefault(require("http"));
 const socket_io_1 = require("socket.io");
 const events_config_1 = require("./socket/events-config");
 const app_config_1 = require("./utils/app-config");
+const dont_wanna_sleep_papa_1 = require("./utils/dont-wanna-sleep-papa");
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 const server = http_1.default.createServer(app);
 const io = new socket_io_1.Server(server, {
     cors: {
-        origin: ['http://localhost:4200'],
+        origin: [
+            'http://localhost:4200',
+            'https://totally-not-omegle.onrender.com'
+        ],
     },
 });
 (0, app_config_1.appConfig)(app);
 (0, events_config_1.socketEventsConfig)(io);
 server.listen(3000, () => {
     console.log('Server listening on port 3000');
+    (0, dont_wanna_sleep_papa_1.IDontWannaSleepPapa)();
 });

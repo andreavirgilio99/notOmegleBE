@@ -107,7 +107,7 @@ export function getUserCollectionHandlers(): UserCollectionHandlers {
                     clearInterval(interval);
                     if (thisUser) {
                         thisUser.camPartner = result.userToPair.socket;
-                        result.userToPair.camPartner = thisUser!.socket;
+                        result.userToPair.camPartner = thisUser.socket;
                         switchUserStatus(result.userToPair.socket!.id, UserStatus.Pending, ageGroup, UserStatus.Paired);
                         pendingSearchs.delete(id);
                         resolve(result);
@@ -147,6 +147,7 @@ export function getUserCollectionHandlers(): UserCollectionHandlers {
                         }
                     }
                 }
+
             }, 50); // intervallo di ricerca in millisecondi
         });
     };
